@@ -38,6 +38,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f7xx_it.h"
+#include "stm32f7xx.h"
    
 /** @addtogroup STM32F7xx_HAL_Examples
   * @{
@@ -163,7 +164,15 @@ void SysTick_Handler(void)
 /*  available peripheral interrupt handler's name please refer to the startup */
 /*  file (startup_stm32f7xx.s).                                               */
 /******************************************************************************/
+extern uint16_t data;
+void ADC_IRQHandler(){
 
+	if((ADC1->SR & ADC_SR_EOC) == ADC_SR_EOC){
+		ADC1->SR &= ~ADC_SR_EOC_Msk;
+		data = ADC1->DR;
+		//my_printf("DR= %d Hz\r\n", ADC1->DR);
+	}
+}
 /**
   * @brief  This function handles PPP interrupt request.
   * @param  None

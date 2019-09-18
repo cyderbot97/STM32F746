@@ -8,6 +8,57 @@
 #include "bsp.h"
 
 /*
+ *
+ */
+void BSP_NVIC_Init(){
+
+	NVIC_SetPriority(ADC_IRQn, 1);
+	NVIC_EnableIRQ(ADC_IRQn);
+
+}
+
+/*
+ * ADC
+ *
+ */
+void adc_init(void)
+{
+	//Enable ADC1 clock
+	RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
+
+	//Enable gpioA clock
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+
+	//configure PA0 as analog
+	GPIOA->MODER &= ~GPIO_MODER_MODER0_Msk;
+	GPIOA->MODER |= (0x03 << GPIO_MODER_MODER0_Pos);
+
+
+	//Set Regular channel sequence length
+	ADC1->SQR1 &= ~ADC_SQR1_L_Msk;
+	ADC1->SQR1 |= ~ADC_SQR1_L_0;
+
+
+	//Set continuous conversion mode
+	//ADC1->CR2 |= ADC_CR2_CONT;		-> too fast
+
+	//12-bits resolution
+	ADC1->CR1 &= ~ADC_CR1_RES_Msk;
+
+	//Sampling time = 15 cycles
+	ADC1->SMPR1 = 0x07;
+
+	//Enable interrupt
+	ADC1->CR1 |= ADC_CR1_EOCIE;
+
+	ADC1->CR2 |= ADC_CR2_ADON; // Enable ADC1
+	//while(!ADC1->ISR & ADC_ISR_ADRD); // wait for ADRDY
+	ADC1->CR2 |= ADC_CR2_SWSTART;
+
+}
+
+
+/*
  * BSP_LED_Init()
  * Initialize LED pin (PB0, PB7, PB14) as  High-Speed Push-Pull Outputs
  * Set LED initial state to OFF

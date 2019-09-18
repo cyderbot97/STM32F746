@@ -9,7 +9,11 @@
 #include "main.h"
 #include "bsp.h"
 #include "delay.h"
+/*
+ * Variable
+ */
 
+uint16_t data;
 
 /*
  * Local Static Functions
@@ -33,6 +37,8 @@ int main(void)
 
 	// Initialize Debug Console
 	BSP_Console_Init();
+	adc_init();
+	BSP_NVIC_Init();
 	my_printf("\r\nConsole Ready!\r\n");
 	my_printf("SYSCLK = %d Hz\r\n", SystemCoreClock);
 
@@ -52,6 +58,9 @@ int main(void)
 		{
 			my_printf("#");
 		}
+		ADC1->CR2 |= ADC_CR2_SWSTART;
+
+//		delay_ms(200);
 	}
 }
 
